@@ -35,8 +35,11 @@ def parse_page_summary(url):
         details = i.xpath('//div[@class="txt"]')[0]
         page_url = details.xpath('//h3/a/@href')[0]
         detail = details.xpath('//div[@class="detail"]/p/span/text()')
-        price = i.xpath('//p[@class="price"]/text()')[0]
-        price = number_re.findall(price)[0]
+        try:
+            price = i.xpath('//p[@class="price"]/text()')[0]
+            price = number_re.findall(price)[0]
+        except:
+            price=-1
         info['url'] = 'http:' + page_url
         room_number = number_re.findall(info['url'])[0]
         if room_number in file_room_number or room_number in [item['room_number'] for item in suitable_info]:
@@ -44,7 +47,7 @@ def parse_page_summary(url):
         info['room_number'] = room_number
         info['price'] = int(price)
         info['area'] = float(number_re.findall(detail[0])[0])
-        if info['area'] > 10 and config['max_price'] > info['price'] > 500:
+        if info['area'] > 10 and ((config['max_price'] > info['price'] > 500) or (info['price']==-1)):
             sleep(.5)
             parse_page_detail(info)
 
@@ -154,15 +157,22 @@ def parse_page_detail(page_detail_info):
             continue
         parts = line.split('：')
         detail_info[parts[0]] = parts[1]
+    if page_detail_info['price']>config['max_price']:
+        return
+    
+    if page_detail_info['price']>config['max_price']:
+        print(page_detail_info['room_number'],page_detail_info['title'], "价格不符合")
+        return
+    
     if "面积" in detail_info.keys():
         page_detail_info['area'] = float(detail_info['面积'].replace('约', '').replace('㎡', ''))
     if "朝向" in detail_info.keys():
         toward = detail_info['朝向']
         if 'toward' in config and toward != config['toward']:
-            print(page_detail_info['room_number'], "朝向不符合")
+            print(page_detail_info['room_number'],page_detail_info['title'], "朝向不符合")
             return
         if 'not_towards' in config and toward in config['not_towards']:
-            print(page_detail_info['room_number'], "朝向不符合")
+            print(page_detail_info['room_number'], page_detail_info['title'],"朝向不符合")
             return
         page_detail_info['toward'] = toward
     if "户型" in detail_info.keys():
