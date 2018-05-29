@@ -82,10 +82,10 @@ def parse_page_detail(page_detail_info):
             page_detail_info['distance'] = path['distance']
             page_detail_info['duration'] = path['duration']
             if 'max_distance' in config and int(path['distance']) > config['max_distance']:
-                print(page_detail_info['room_number'], "距离不符合")
+                print(page_detail_info['room_number'],page_detail_info['title'], "距离不符合")
                 return
             if 'max_time' in config and int(path['duration']) > config['max_time']:
-                print(page_detail_info['room_number'], "时间不符合")
+                print(page_detail_info['room_number'], page_detail_info['title'],"时间不符合")
                 return
 
     page_detail_info['location'] = location

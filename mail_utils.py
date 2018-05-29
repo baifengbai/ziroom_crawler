@@ -33,5 +33,5 @@ def sendmail(subject, message=u'请及时查收，谢谢。'):
     s.login(sender, password)
 
     # # 发送给多人、同时抄送给多人，发送人和抄送人放在同一个列表中
-    s.sendmail(sender, receiver, msgroot.as_string())
+    s.sendmail(sender, receiver.split(','), msgroot.as_string())
     s.quit()
